@@ -1,0 +1,147 @@
+
+class Ant extends Thread{
+
+		private int ID;
+		private boolean outside;
+		private AntHill ac;
+		private final static long THROUGH = 1500;
+		public Ant(int ID,AntHill ac){
+			this.ID=ID;
+			this.outside=true;
+			this.ac=ac;
+			
+		}
+		public void run(){
+			while(this.isAlive()){
+			if(this.outside){
+			this.tryEnter();
+			}
+			else{
+				this.tryExit();
+				
+			}
+			}
+		}
+		public void tryEnter(){
+			
+				if(this.ac.acqire()){
+					this.goInside();
+					this.ac.release();
+				}
+				
+				
+			
+			
+		}
+		public void tryExit(){
+		
+			if(this.ac.acqire()){
+				this.comeoutside();
+				this.ac.release();
+			}
+			
+		
+			
+		}
+		public void goInside(){
+			System.out.println(Thread.currentThread().getName()+"  "+this.getID()+"Entering the ant hill.");
+			try{
+			Thread.sleep(THROUGH);
+			this.outside=false;
+			System.out.println("Entered");
+			}catch(InterruptedException e){
+				
+				System.out.println(e);
+			}
+			
+		}
+		
+		public void comeoutside(){
+			System.out.println(Thread.currentThread().getName()+"  "+this.ID+" "+"Exiting the Ant hill.");
+			try{
+				Thread.sleep(THROUGH);
+				this.outside=true;
+				System.out.println("Exited");
+				}catch(InterruptedException e){
+					
+					System.out.println(e);
+				}
+		}
+		public int getID(){
+			return this.ID;
+			
+		}
+		public boolean isOutside(){
+			return this.outside;
+		}
+		public AntHill getAntCollony(){
+			return this.ac;
+		}
+}
+/////////////////////////////////////////
+
+ class AntCollony {
+
+			private int size;
+			private Ant[] antSet;
+			private AntHill hill;
+			
+			public AntCollony(int size){
+				this.size=size;
+				this.antSet=new Ant[this.size];
+				this.hill=new AntHill();
+			}
+	
+		public void antLife(){
+			for(int i=1;i<this.size+1;i++){
+				this.antSet[i-1]=new Ant(i,this.hill);
+				
+				
+			}
+			for(int i=1;i<this.size+1;i++){
+			this.antSet[i-1].start();
+			}
+		}
+		public static void main (String[] args){
+			AntCollony front=new AntCollony(1000);
+			front.antLife();
+			
+		}
+}
+//////////////////////////////////////////
+
+ class AntHill {
+
+		//private int maxima;
+		private int noofantsinthecollony;
+		private int current;
+		
+		public  AntHill(){
+			this.noofantsinthecollony=0;
+			this.current=0;
+		}
+	
+	public  synchronized boolean acqire(){
+		if(this.current==0){
+			++this.current;
+			return true;
+		}
+		else
+		return false;
+		
+	}
+	public synchronized void release(){
+		--this.current;
+		
+	}
+	public void incrementAnts(){
+		++this.noofantsinthecollony;
+	}
+	public void decrementAnts(){
+		--this.noofantsinthecollony;
+	}
+	public int getnoofAnts(){
+	return	this.noofantsinthecollony;
+	}
+}
+//////////////////////////////////////////
